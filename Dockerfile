@@ -22,7 +22,7 @@ FROM scratch
 COPY --from=builder /app/image-dock-server /
 
 # Expose app port
-EXPOSE 8080
+EXPOSE 8000
 
 # Command
 ENTRYPOINT ["/image-dock-server"]
