@@ -11,7 +11,6 @@ func EnableCORS(next http.Handler) http.Handler {
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
-		AllowCredentials: true,
 	})
 	return c.Handler(next)
 }
