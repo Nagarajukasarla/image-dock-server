@@ -4,25 +4,23 @@
 FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
-
 COPY go.mod go.sum ./
 RUN go mod download
-
 COPY . .
 
-# Disable CGO and build static binary (safer for Alpine)
+# Build static binary
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o image-dock-server .
 
 # -----------------------------------------------------
-# Stage 2: Minimal runtime image
+# Stage 2: Minimal runtime image (with certs)
 # -----------------------------------------------------
-FROM scratch
+FROM alpine:latest
 
-# Copy binary
-COPY --from=builder /app/image-dock-server /
+# Install CA certificates (needed for HTTPS)
+RUN apk --no-cache add ca-certificates
 
-# Expose app port
+WORKDIR /app
+COPY --from=builder /app/image-dock-server .
+
 EXPOSE 8000
-
-# Command
-ENTRYPOINT ["/image-dock-server"]
+ENTRYPOINT ["./image-dock-server"]
