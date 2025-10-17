@@ -72,8 +72,13 @@ func UploadHandler(w http.ResponseWriter, r *http.Request, s3Client *s3.Client) 
 
 	publicURL := publicBase + "/" + strings.ReplaceAll(key, "\\", "/")
 
+	// Get additional fields from form
+	category := r.FormValue("category")
+	subCategory := r.FormValue("sub_category")
+	name := r.FormValue("name")
+
 	// Store image record in database
-	err = utils.StoreImage(header.Filename, key, bucket, publicURL)
+	err = utils.StoreImage(header.Filename, key, bucket, publicURL, category, subCategory, name)
 	if err != nil {
 		log.Printf("Failed to store image in database: %v", err)
 		// Don't return error as upload was successful, just log it
