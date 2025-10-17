@@ -21,6 +21,7 @@ type ImageRecord struct {
 	UploadedAt  string `json:"uploaded_at"`
 	Category    string `json:"category"`
 	SubCategory string `json:"sub_category"`
+	ProductName string `json:"product_name"`
 	Name        string `json:"name"`
 }
 
@@ -74,6 +75,7 @@ func createImagesTable(db *sql.DB) error {
 		uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		category VARCHAR(200) NOT NULL,
 		sub_category VARCHAR(200) NOT NULL,
+		product_name VARCHAR(200) NOT NULL,
 		name VARCHAR(255) NOT NULL
 	);`
 
@@ -86,27 +88,27 @@ func createImagesTable(db *sql.DB) error {
 	return nil
 }
 
-func StoreImage(filename, s3Key, s3Bucket, imageURL, category, subCategory, name string) error {
+func StoreImage(filename, s3Key, s3Bucket, imageURL, category, subCategory, productName, name string) error {
 	query := `
-		INSERT INTO images (filename, s3_key, s3_bucket, url, category, sub_category, name)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)`
+		INSERT INTO images (filename, s3_key, s3_bucket, url, category, sub_category, product_name, name)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-	_, err := DB.Exec(query, filename, s3Key, s3Bucket, imageURL, category, subCategory, name)
+	_, err := DB.Exec(query, filename, s3Key, s3Bucket, imageURL, category, subCategory, productName, name)
 	if err != nil {
 		return fmt.Errorf("failed to store image record: %v", err)
 	}
 
-	log.Printf("💾 Image record stored in database - Filename: %s, S3Key: %s, Category: %s, SubCategory: %s, Name: %s", filename, s3Key, category, subCategory, name)
+	log.Printf("💾 Image record stored in database - Filename: %s, S3Key: %s, Category: %s, SubCategory: %s, ProductName: %s, Name: %s", filename, s3Key, category, subCategory, productName, name)
 	return nil
 }
 
 func GetImageByID(id int) (*ImageRecord, error) {
-	query := `SELECT id, filename, s3_key, s3_bucket, url, uploaded_at, category, sub_category, name FROM images WHERE id = $1`
+	query := `SELECT id, filename, s3_key, s3_bucket, url, uploaded_at, category, sub_category, product_name, name FROM images WHERE id = $1`
 
 	row := DB.QueryRow(query, id)
 
 	var img ImageRecord
-	err := row.Scan(&img.ID, &img.Filename, &img.S3Key, &img.S3Bucket, &img.URL, &img.UploadedAt, &img.Category, &img.SubCategory, &img.Name)
+	err := row.Scan(&img.ID, &img.Filename, &img.S3Key, &img.S3Bucket, &img.URL, &img.UploadedAt, &img.Category, &img.SubCategory, &img.ProductName, &img.Name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image: %v", err)
 	}
@@ -115,7 +117,7 @@ func GetImageByID(id int) (*ImageRecord, error) {
 }
 
 func GetAllImages() ([]ImageRecord, error) {
-	query := `SELECT id, filename, s3_key, s3_bucket, url, uploaded_at, category, sub_category, name FROM images ORDER BY uploaded_at DESC`
+	query := `SELECT id, filename, s3_key, s3_bucket, url, uploaded_at, category, sub_category, product_name, name FROM images ORDER BY uploaded_at DESC`
 
 	rows, err := DB.Query(query)
 	if err != nil {
@@ -126,7 +128,7 @@ func GetAllImages() ([]ImageRecord, error) {
 	var images []ImageRecord
 	for rows.Next() {
 		var img ImageRecord
-		err := rows.Scan(&img.ID, &img.Filename, &img.S3Key, &img.S3Bucket, &img.URL, &img.UploadedAt, &img.Category, &img.SubCategory, &img.Name)
+		err := rows.Scan(&img.ID, &img.Filename, &img.S3Key, &img.S3Bucket, &img.URL, &img.UploadedAt, &img.Category, &img.SubCategory, &img.ProductName, &img.Name)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan image row: %v", err)
 		}
