@@ -127,11 +127,13 @@ func ListImagesHandler(w http.ResponseWriter, r *http.Request, s3Client *s3.Clie
 
 func HelloworldHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
+		log.Println("Hello World! This is a test endpoint.")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
 	if r.Method != http.MethodGet {
+		log.Println("Method Not found!")
 		http.Error(w, "Invalid method", http.StatusMethodNotAllowed)
 		return
 	}
