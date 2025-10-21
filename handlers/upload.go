@@ -124,3 +124,22 @@ func ListImagesHandler(w http.ResponseWriter, r *http.Request, s3Client *s3.Clie
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(urls)
 }
+
+func HelloworldHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	resp := UploadResponse{
+		Message: "Hello World! This is a test endpoint.",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}

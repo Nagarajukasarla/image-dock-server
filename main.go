@@ -31,6 +31,9 @@ func main() {
 	mux.HandleFunc("/images", func(w http.ResponseWriter, r *http.Request) {
 		handlers.ListImagesHandler(w, r, s3Client)
 	})
+	mux.HandleFunc("/helloworld", func(w http.ResponseWriter, r *http.Request) {
+		handlers.HelloworldHandler(w, r)
+	})
 
 	handler := internal.EnableCORS(mux)
 
